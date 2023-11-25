@@ -5,12 +5,12 @@ import * as contentful from 'contentful';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
 
 // Import Tailwind CSS
-import './index.css'
+import './index.css';
 
 const client = contentful.createClient({
     space: '7v7uj721jzu9',
     accessToken: '-XXLrVmtPMSEsBHki5MLnO-P0eYlPTpcaCXe74uLPVc',
-});
+  });
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -33,14 +33,41 @@ const BlogDetail = () => {
     return <div>Loading...</div>;
   }
 
+  const renderOptions = {
+    renderNode: {
+      'embedded-asset-block': (node) => {
+        const { title, description, file } = node.data.target.fields;
+        const imageUrl = file.url;
+        return (
+          <img
+            src={imageUrl}
+            alt={description || title || 'Image'}
+            className="my-4 max-w-full"
+          />
+        );
+      },
+    },
+  };
+
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 blog-detail">
       {/* Display blog details */}
       <div>
         <h1>{post.fields.title}</h1>
-        {/* Render rich text content */}
-        {post.fields.content && documentToReactComponents(post.fields.content)}
-        {/* Add other fields as needed (e.g., image) */}
+
+        {post.fields.image && (
+          <img
+            src={post.fields.image.fields.file.url}
+            alt={post.fields.image.fields.description || 'Image'}
+            className="my-4 max-w-full"
+          />
+        )}
+        
+        {/* Render rich text content including images */}
+        {post.fields.content && documentToReactComponents(post.fields.content, renderOptions)}
+
+        
+
       </div>
       {/* Social media sharing options */}
       <div className="mt-4">
